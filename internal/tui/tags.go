@@ -14,6 +14,7 @@ type TagMode int
 const (
 	TagList TagMode = iota
 	TagEdit
+	TagConfirmPush
 )
 
 type TagModel struct {
@@ -23,10 +24,11 @@ type TagModel struct {
 	err    error
 	notice string
 
-	mode   TagMode
-	input  textinput.Model
-	latest string
-	tagErr string
+	mode    TagMode
+	input   textinput.Model
+	latest  string
+	tagErr  string
+	pending string
 }
 
 func NewTagModel() *TagModel {
@@ -85,9 +87,25 @@ func (m *TagModel) createTag() {
 		m.tagErr = fmt.Sprintf("tag failed: %v", err)
 		return
 	}
-	m.notice = fmt.Sprintf("created tag %q", name)
-	m.mode = TagList
+	m.pending = name
+	m.mode = TagConfirmPush
 	m.refresh()
+}
+
+func (m *TagModel) confirmPush(push bool) {
+	name := m.pending
+	m.pending = ""
+	if push {
+		if err := ggit.PushTag(name); err != nil {
+			m.tagErr = fmt.Sprintf("push failed: %v", err)
+			m.notice = fmt.Sprintf("created tag %q", name)
+		} else {
+			m.notice = fmt.Sprintf("pushed tag %q", name)
+		}
+	} else {
+		m.notice = fmt.Sprintf("created tag %q (not pushed)", name)
+	}
+	m.mode = TagList
 }
 
 func (m *TagModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
@@ -117,7 +135,22 @@ func (m *TagModel) handleTagKey(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 	if m.mode == TagEdit {
 		return m.handleEditKey(msg)
 	}
+	if m.mode == TagConfirmPush {
+		return m.handleConfirmPushKey(msg)
+	}
 	return m.handleListKey(msg)
+}
+
+func (m *TagModel) handleConfirmPushKey(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
+	switch msg.String() {
+	case "y":
+		m.confirmPush(true)
+		return m, nil
+	case "n", "esc", "q":
+		m.confirmPush(false)
+		return m, nil
+	}
+	return m, nil
 }
 
 func (m *TagModel) handleListKey(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
@@ -172,6 +205,9 @@ func (m *TagModel) handleEditKey(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 func (m *TagModel) View() string {
 	if m.mode == TagEdit {
 		return m.editView()
+	}
+	if m.mode == TagConfirmPush {
+		return m.confirmPushView()
 	}
 	return m.listView()
 }
@@ -228,6 +264,15 @@ func (m *TagModel) editView() string {
 	b.WriteString("\n" + DimStyle.Render(
 		" ←/→:move   ↑/↓:bump number   type:edit   enter:create   esc:cancel"))
 
+	return ModalBorderStyle.Width(max(40, min(60, m.width-4))).Render(b.String())
+}
+
+func (m *TagModel) confirmPushView() string {
+	var b strings.Builder
+	b.WriteString(TitleStyle.Render("Tag created") + "\n\n")
+	b.WriteString("Tag " + SelectedStyle.Render(m.pending) + " created.\n")
+	b.WriteString("Push it to the remote?\n\n")
+	b.WriteString("y:push   n:skip\n")
 	return ModalBorderStyle.Width(max(40, min(60, m.width-4))).Render(b.String())
 }
 

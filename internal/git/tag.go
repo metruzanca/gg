@@ -24,3 +24,8 @@ func CreateTag(name string) error {
 	cmd := exec.Command("git", "tag", name)
 	return cmd.Run()
 }
+
+func PushTag(name string) error {
+	cmd := exec.Command("git", "push", "origin", name)
+	return cmd.Run()
+}
