@@ -34,6 +34,8 @@ func IncrementVersionAt(value string, pos, delta int) (string, int, bool) {
 		return value, pos, false
 	}
 
+	segIdx := segmentIndex(value, start)
+
 	n += delta
 	if n < 0 {
 		n = 0
@@ -48,7 +50,58 @@ func IncrementVersionAt(value string, pos, delta int) (string, int, bool) {
 	}
 
 	value = value[:start] + newNum + value[end:]
+	value = resetLowerSegments(value, segIdx)
 	return value, start + len(newNum), true
+}
+
+// segmentIndex returns the zero-based index of the version segment containing
+// the byte at position start (major=0, minor=1, patch=2, ...).
+func segmentIndex(value string, start int) int {
+	prefix := 0
+	if strings.HasPrefix(value, "v") {
+		prefix = 1
+	}
+	idx := 0
+	for i := start - 1; i >= prefix; i-- {
+		if value[i] == '.' {
+			idx++
+		}
+	}
+	return idx
+}
+
+// resetLowerSegments zeroes every segment after segIdx so that bumping a
+// higher-order number also resets the lower-order ones (e.g. bumping the major
+// clears the minor and patch).
+func resetLowerSegments(value string, segIdx int) string {
+	prefix := ""
+	rest := value
+	if strings.HasPrefix(rest, "v") {
+		prefix = "v"
+		rest = rest[1:]
+	}
+	segs := strings.Split(rest, ".")
+	if segIdx < 0 || segIdx >= len(segs)-1 {
+		return value
+	}
+	for i := segIdx + 1; i < len(segs); i++ {
+		if allDigits(segs[i]) {
+			segs[i] = "0"
+		}
+	}
+	return prefix + strings.Join(segs, ".")
+}
+
+func allDigits(s string) bool {
+	if s == "" {
+		return false
+	}
+	for i := 0; i < len(s); i++ {
+		if !isDigit(s[i]) {
+			return false
+		}
+	}
+	return true
 }
 
 func isDigit(b byte) bool {
