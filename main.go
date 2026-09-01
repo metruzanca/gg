@@ -1,6 +1,6 @@
 package main
 
-import "github.com/metru/gg/cmd"
+import "github.com/metruzanca/gg/cmd"
 
 func main() {
 	cmd.Execute()

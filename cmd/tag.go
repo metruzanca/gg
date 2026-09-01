@@ -1,7 +1,7 @@
 package cmd
 
 import (
-	"github.com/metru/gg/internal/tui"
+	"github.com/metruzanca/gg/internal/tui"
 	"github.com/spf13/cobra"
 )
 

@@ -2,7 +2,7 @@ package tui
 
 import (
 	tea "github.com/charmbracelet/bubbletea"
-	ggit "github.com/metru/gg/internal/git"
+	ggit "github.com/metruzanca/gg/internal/git"
 )
 
 func (m *Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {

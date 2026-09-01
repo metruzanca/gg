@@ -1,4 +1,4 @@
-module github.com/metru/gg
+module github.com/metruzanca/gg
 
 go 1.26.5
 

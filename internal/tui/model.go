@@ -4,11 +4,11 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/charmbracelet/bubbles/textinput"
 	"github.com/charmbracelet/bubbles/textarea"
+	"github.com/charmbracelet/bubbles/textinput"
 	tea "github.com/charmbracelet/bubbletea"
-	"github.com/metru/gg/internal/config"
-	ggit "github.com/metru/gg/internal/git"
+	"github.com/metruzanca/gg/internal/config"
+	ggit "github.com/metruzanca/gg/internal/git"
 )
 
 type ModalType int

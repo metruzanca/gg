@@ -5,7 +5,7 @@ import (
 	"strings"
 
 	"github.com/charmbracelet/lipgloss"
-	ggit "github.com/metru/gg/internal/git"
+	ggit "github.com/metruzanca/gg/internal/git"
 )
 
 type Panel struct {

@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-	ggit "github.com/metru/gg/internal/git"
+	ggit "github.com/metruzanca/gg/internal/git"
 )
 
 func (m *Model) confirmView() string {

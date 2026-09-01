@@ -6,7 +6,7 @@ import (
 
 	"github.com/charmbracelet/bubbles/textinput"
 	tea "github.com/charmbracelet/bubbletea"
-	ggit "github.com/metru/gg/internal/git"
+	ggit "github.com/metruzanca/gg/internal/git"
 )
 
 type TagMode int
