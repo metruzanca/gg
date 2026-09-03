@@ -51,9 +51,10 @@ gg tag    # manage tags
 
 ## Demos
 
-The demos are recorded with [VHS](https://github.com/charmbracelet/vhs). Replay
-them from the `demos/` directory:
+The demos are recorded with [VHS](https://github.com/charmbracelet/vhs), using a
+patched fork build that fixes a startup race (see `demos/investigate/README.md`).
+Replay them from the `demos/` directory:
 
 ```sh
-vhs demos/tag-bump.tape
+demos/render.sh
 ```
