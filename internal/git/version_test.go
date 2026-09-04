@@ -101,3 +101,31 @@ func TestLatestVersion(t *testing.T) {
 		}
 	}
 }
+
+func TestBumpMinor(t *testing.T) {
+	cases := []struct {
+		value string
+		want  string
+		ok    bool
+	}{
+		{"v0.1.0", "v0.2.0", true},
+		{"v1.2.3", "v1.3.0", true},
+		{"v1.9.3", "v1.10.0", true},
+		{"1.2.3", "1.3.0", true},
+		{"v1.2", "v1.3", true},
+		{"v0.0.0", "v0.1.0", true},
+		{"v1", "", false},
+		{"", "", false},
+		{"v..0", "", false},
+	}
+	for _, c := range cases {
+		got, ok := BumpMinor(c.value)
+		if ok != c.ok {
+			t.Errorf("BumpMinor(%q) ok=%v, want %v", c.value, ok, c.ok)
+			continue
+		}
+		if ok && got != c.want {
+			t.Errorf("BumpMinor(%q) = %q, want %q", c.value, got, c.want)
+		}
+	}
+}

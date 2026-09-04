@@ -124,6 +124,26 @@ func LatestVersion(tags []string) string {
 	return best
 }
 
+// BumpMinor increments the minor component of a semver tag and resets the
+// lower components (e.g. v1.2.3 -> v1.3.0). It returns false when the tag has
+// no minor component to bump.
+func BumpMinor(version string) (string, bool) {
+	groups := 0
+	for i := 0; i < len(version); i++ {
+		if isDigit(version[i]) {
+			if groups == 1 {
+				bumped, _, ok := IncrementVersionAt(version, i, 1)
+				return bumped, ok
+			}
+			for i < len(version) && isDigit(version[i]) {
+				i++
+			}
+			groups++
+		}
+	}
+	return version, false
+}
+
 func parseVersion(t string) ([]int, bool) {
 	s := t
 	if strings.HasPrefix(s, "v") {
