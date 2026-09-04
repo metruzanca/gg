@@ -96,11 +96,11 @@ func (m *TagModel) confirmPush(push bool) {
 	name := m.pending
 	m.pending = ""
 	if push {
-		if err := ggit.PushTag(name); err != nil {
+		if err := ggit.PushTagWithCommits(name); err != nil {
 			m.tagErr = fmt.Sprintf("push failed: %v", err)
 			m.notice = fmt.Sprintf("created tag %q", name)
 		} else {
-			m.notice = fmt.Sprintf("pushed tag %q", name)
+			m.notice = fmt.Sprintf("pushed tag %q and its commits", name)
 		}
 	} else {
 		m.notice = fmt.Sprintf("created tag %q (not pushed)", name)
@@ -271,7 +271,7 @@ func (m *TagModel) confirmPushView() string {
 	var b strings.Builder
 	b.WriteString(TitleStyle.Render("Tag created") + "\n\n")
 	b.WriteString("Tag " + SelectedStyle.Render(m.pending) + " created.\n")
-	b.WriteString("Push it to the remote?\n\n")
+	b.WriteString("Push it and its commits to the remote?\n\n")
 	b.WriteString("y:push   n:skip\n")
 	return ModalBorderStyle.Width(max(40, min(60, m.width-4))).Render(b.String())
 }
